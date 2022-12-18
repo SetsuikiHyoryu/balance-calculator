@@ -1,11 +1,18 @@
 <script setup lang="ts">
 import ConfirmModal from './features/confirm-modal/components/ConfirmModal.vue'
-import { ref } from 'vue'
+
+import { ref, watch } from 'vue'
+import http from './lib/axios'
 
 const refInput = ref<HTMLInputElement>()
 
 const balance = ref<number>(0)
 const setBalance = (money: number) => (balance.value = money)
+
+watch<number>(balance, () => {
+  http({ method: 'GET' })
+  console.log('post')
+})
 
 function changeBalance(): void {
   const money = Number(refInput.value?.value ?? 0)
@@ -50,7 +57,7 @@ function confirmChange(): void {
       <span class="balance">{{ balance }} JPY</span>
 
       <input
-        type="text"
+        type="number"
         ref="refInput"
         class="inputter"
         @keypress.enter="confirmChange"

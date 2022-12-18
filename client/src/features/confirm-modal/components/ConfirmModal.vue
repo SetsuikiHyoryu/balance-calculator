@@ -32,7 +32,7 @@ function tabConfirm(): void {
         取消
       </button>
 
-      <button @click="handleConfim" @keydown.tab="tabConfirm">确认</button>
+      <button @click="handleConfim" @blur="tabConfirm">确认</button>
     </div>
   </div>
 </template>
