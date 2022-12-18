@@ -1,29 +1,97 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import ConfirmModal from './features/confirm-modal/components/ConfirmModal.vue'
+import { ref } from 'vue'
+
+const refInput = ref<HTMLInputElement>()
+
+const balance = ref<number>(0)
+const setBalance = (money: number) => (balance.value = money)
+
+function changeBalance(): void {
+  const money = Number(refInput.value?.value ?? 0)
+  setBalance(balance.value ? balance.value - money : money)
+  refInput.value && (refInput.value.value = '')
+}
+
+function clearBalance(): void {
+  setBalance(0)
+}
+
+const confirmModalDisplayed = ref<boolean>(false)
+
+const setConfirmModalDisplayed = (status: boolean) =>
+  (confirmModalDisplayed.value = status)
+
+const confirmCallback = ref<Function>(() => {})
+
+const setConfirmCallback = (callback: Function) =>
+  (confirmCallback.value = callback)
+
+function confirmClear(): void {
+  setConfirmCallback(clearBalance)
+  setConfirmModalDisplayed(true)
+}
+
+function confirmChange(): void {
+  setConfirmCallback(changeBalance)
+  setConfirmModalDisplayed(true)
+}
 </script>
 
 <template>
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+  <div class="app">
+    <ConfirmModal
+      :modal-displayed="confirmModalDisplayed"
+      :modal-display-setter="setConfirmModalDisplayed"
+      :confirm-callback="confirmCallback"
+    />
+
+    <div class="main-wrapper">
+      <span class="balance">{{ balance }} JPY</span>
+
+      <input
+        type="text"
+        ref="refInput"
+        class="inputter"
+        @keypress.enter="confirmChange"
+      />
+
+      <div class="button-group">
+        <button @click="confirmClear">清空</button>
+        <button @click="confirmChange">确认</button>
+      </div>
+    </div>
   </div>
-  <HelloWorld msg="Vite + Vue" />
 </template>
 
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
+.app {
+  align-items: center;
+  background: #888;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  justify-content: center;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+
+.main-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 10rem;
 }
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+
+.balance {
+  align-self: flex-end;
+}
+
+.inputter {
+  box-sizing: border-box;
+  margin: 1rem 0 0;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  margin: 1rem 0 0;
 }
 </style>
